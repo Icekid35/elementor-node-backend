@@ -3,8 +3,9 @@
   "version": "1.0.0",
   "description": "Backend API for Elementor registration system (company and self-employed users)",
   "main": "index.js",
+  "type":"module",
   "scripts": {
-    "start": "node index.js",
+    "start": "npx prisma generate && node index.js",
     "build": "echo 'No build step needed'",
     "prisma:generate": "npx prisma generate",
     "prisma:migrate": "npx prisma migrate dev",
