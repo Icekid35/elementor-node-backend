@@ -239,3 +239,50 @@ app.get("/api/user/profile", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+// === Delete Account ===
+app.delete("/api/user/delete", async (req, res) => {
+  const { business_email, type } = req.body;
+
+  if (!business_email || !type) {
+    return res.status(400).json({
+      success: false,
+      message: "Missing required fields: business_email and type",
+    });
+  }
+
+  try {
+    if (type === "company") {
+      const existing = await prisma.company.findUnique({ where: { business_email } });
+      if (!existing) {
+        return res.status(404).json({ success: false, message: "Company not found" });
+      }
+
+      await prisma.company.delete({ where: { business_email } });
+      return res.json({
+        success: true,
+        message: "Company account deleted successfully",
+      });
+    }
+
+    if (type === "self-employed") {
+      const existing = await prisma.selfEmployed.findUnique({ where: { business_email } });
+      if (!existing) {
+        return res.status(404).json({ success: false, message: "Self-employed user not found" });
+      }
+
+      await prisma.selfEmployed.delete({ where: { business_email } });
+      return res.json({
+        success: true,
+        message: "Self-employed account deleted successfully",
+      });
+    }
+
+    return res.status(400).json({
+      success: false,
+      message: "Invalid type. Must be 'company' or 'self-employed'",
+    });
+  } catch (error) {
+    console.error("Delete error:", error);
+    return res.status(500).json({ success: false, message: "Server error while deleting account" });
+  }
+});
