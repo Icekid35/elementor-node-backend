@@ -1,0 +1,44 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://alltogether_owner:npg_0mVpEQXlaA5d@ep-lucky-bonus-a8wl3bu6-pooler.eastus2.azure.neon.tech/alltogether?sslmode=require"
+}
+
+model Company {
+  id                     Int      @id @default(autoincrement())
+  company_name           String
+  business_email         String   @unique
+  phone_number           String
+  area_of_specialization String
+  region                 String
+  company_website        String
+  company_description    String
+  password               String
+  specialization_details String
+  latitude               Float
+  longitude              Float
+  consent_age            Boolean
+  consent_work_uk        Boolean
+  publication_consent    Boolean
+  createdAt              DateTime @default(now())
+}
+model SelfEmployed {
+  id                      Int      @id @default(autoincrement())
+  first_name              String
+  last_name               String
+  business_email          String   @unique
+  phone_number            String
+  occupation              String
+  service_provided        String
+  region                  String
+  years_experience        String
+  password                String
+  consent_data_processing Boolean
+  consent_terms_conditions Boolean
+  latitude                Float
+  longitude               Float
+  createdAt               DateTime @default(now())
+}

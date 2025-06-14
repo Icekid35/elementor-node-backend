@@ -1,16 +1,25 @@
 {
   "name": "elementor-backend",
   "version": "1.0.0",
+  "description": "Backend API for Elementor registration system (company and self-employed users)",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node index.js",
+    "build": "echo 'No build step needed'",
+    "prisma:generate": "npx prisma generate",
+    "prisma:migrate": "npx prisma migrate dev",
+    "prisma:deploy": "npx prisma migrate deploy"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "author": "Bello Habeebullahi",
+  "license": "MIT",
+  "keywords": ["elementor", "express", "prisma", "backend", "registration", "api"],
   "dependencies": {
+    "@prisma/client": "^6.9.0",
     "cors": "^2.8.5",
     "express": "^5.1.0"
+  },
+
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
