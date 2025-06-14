@@ -9,7 +9,16 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Health Check
+// === Helper: Check email in both models ===
+async function checkEmailExistsInAnyModel(email) {
+  const [company, selfEmployed] = await Promise.all([
+    prisma.company.findUnique({ where: { business_email: email } }),
+    prisma.selfEmployed.findUnique({ where: { business_email: email } }),
+  ]);
+  return company || selfEmployed;
+}
+
+// === Health Check ===
 app.get("/", (req, res) => {
   res.send("Elementor Node backend is running ✅");
 });
@@ -18,11 +27,8 @@ app.get("/", (req, res) => {
 app.post("/api/company/signup", async (req, res) => {
   const data = req.body;
   try {
-    const existing = await prisma.company.findUnique({
-      where: { business_email: data.business_email }
-    });
-
-    if (existing) {
+    const exists = await checkEmailExistsInAnyModel(data.business_email);
+    if (exists) {
       return res.status(409).json({
         success: false,
         message: "Email already exists. Please log in instead.",
@@ -47,11 +53,8 @@ app.post("/api/company/signup", async (req, res) => {
 app.post("/api/self-employed/signup", async (req, res) => {
   const data = req.body;
   try {
-    const existing = await prisma.selfEmployed.findUnique({
-      where: { business_email: data.business_email }
-    });
-
-    if (existing) {
+    const exists = await checkEmailExistsInAnyModel(data.business_email);
+    if (exists) {
       return res.status(409).json({
         success: false,
         message: "Email already exists. Please log in instead.",
@@ -72,7 +75,7 @@ app.post("/api/self-employed/signup", async (req, res) => {
   }
 });
 
-// === Login (Check both models) ===
+// === Login ===
 app.post("/api/login", async (req, res) => {
   const { business_email, password } = req.body;
 
@@ -167,6 +170,8 @@ app.get("/api/users", async (req, res) => {
     res.status(500).json({ success: false, message: "Server error" });
   }
 });
+
+// === Get Profile by Type & Email ===
 app.get("/api/user/profile", async (req, res) => {
   const { type, business_email } = req.query;
 
@@ -230,7 +235,7 @@ app.get("/api/user/profile", async (req, res) => {
   }
 });
 
-// Start Server
+// === Start Server ===
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
