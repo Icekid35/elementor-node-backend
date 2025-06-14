@@ -41,7 +41,7 @@ app.post("/api/company/signup", async (req, res) => {
       success: true,
       message: "Received company signup data",
       received: data,
-      redirect: "/dashboard",
+      redirect: "/login",
     });
   } catch (error) {
     console.error(error);
@@ -67,7 +67,7 @@ app.post("/api/self-employed/signup", async (req, res) => {
       success: true,
       message: "Received self-employed signup data",
       received: data,
-      redirect: "/dashboard",
+      redirect: "/login",
     });
   } catch (error) {
     console.error(error);
@@ -87,7 +87,7 @@ app.post("/api/login", async (req, res) => {
         message: "Company login successful",
         user: company,
         type: "company",
-        redirect: "/login",
+        redirect: "/profile",
       });
     }
 
@@ -98,7 +98,7 @@ app.post("/api/login", async (req, res) => {
         message: "Self-employed login successful",
         user: selfEmployed,
         type: "self-employed",
-        redirect: "/login",
+        redirect: "/profile",
       });
     }
 
@@ -126,7 +126,7 @@ app.post("/api/user/update", async (req, res) => {
         success: true,
         message: "Company profile updated",
         updated,
-        redirect: "/profile",
+      //   redirect: "/profile",
       });
     }
 
@@ -139,7 +139,7 @@ app.post("/api/user/update", async (req, res) => {
         success: true,
         message: "Self-employed profile updated",
         updated,
-        redirect: "/profile",
+      //   redirect: "/profile",
       });
     }
 
