@@ -12,7 +12,6 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 // Stripe webhook route needs raw body
-app.use(express.json()); // All other routes use JSON
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-08-16",
@@ -90,6 +89,7 @@ app.post("/webhook", express.raw({type: 'application/json'}), (req, res) => {
 
   res.status(200).send("Webhook received");
 });
+app.use(express.json()); // All other routes use JSON
 
 // === Health Check ===
 app.get("/", (req, res) => {
