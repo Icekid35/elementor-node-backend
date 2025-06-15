@@ -36,8 +36,9 @@ model SelfEmployed {
   region                  String
   years_experience        String
   password                String
-  consent_data_processing Boolean
-  consent_terms_conditions Boolean
+  consent_age            Boolean
+  consent_work_uk        Boolean
+  publication_consent    Boolean
   latitude                Float
   longitude               Float
   createdAt               DateTime @default(now())

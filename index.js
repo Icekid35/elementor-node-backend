@@ -235,10 +235,6 @@ app.get("/api/user/profile", async (req, res) => {
   }
 });
 
-// === Start Server ===
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
 // === Delete Account ===
 app.delete("/api/user/delete", async (req, res) => {
   const { business_email, type } = req.body;
@@ -285,4 +281,8 @@ app.delete("/api/user/delete", async (req, res) => {
     console.error("Delete error:", error);
     return res.status(500).json({ success: false, message: "Server error while deleting account" });
   }
+});
+// === Start Server ===
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
