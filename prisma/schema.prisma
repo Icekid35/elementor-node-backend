@@ -29,7 +29,7 @@ model Company {
 model SelfEmployed {
   id                      Int      @id @default(autoincrement())
   first_name              String
-  surname                  String
+  last_name               String
   business_email          String   @unique
   phone_number            String
   occupation              String
