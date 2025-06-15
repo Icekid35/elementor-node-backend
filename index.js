@@ -9,17 +9,8 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
-app.use(express.json({
-verify: (req, res, buf) => {
-  if (req.originalUrl.startsWith('/stripe/webhook')) {
-    req.rawBody = buf.toString();
-  }
-},
- })); // All other routes use JSON
 
-app.use(cors());
 // Stripe webhook route needs raw body
-
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
   apiVersion: "2023-08-16",
 });
@@ -61,7 +52,7 @@ async function activateUserByEmail(email) {
 }
 
 app.post("/webhook", express.raw({type: 'application/json'}), (req, res) => {
- console.log(req.rawBody)
+ console.log(req.body)
   const sig = req.headers["stripe-signature"];
   let event;
 
@@ -97,6 +88,9 @@ app.post("/webhook", express.raw({type: 'application/json'}), (req, res) => {
   res.status(200).send("Webhook received");
 });
 
+app.use(express.json()); // All other routes use JSON
+
+app.use(cors());
 // === Health Check ===
 app.get("/", (req, res) => {
   res.send("Elementor Node backend is running ✅");
