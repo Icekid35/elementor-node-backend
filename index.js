@@ -12,7 +12,6 @@ const PORT = process.env.PORT || 5000;
 
 app.use(cors());
 // Stripe webhook route needs raw body
-app.post("/webhook", express.raw({ type: "application/json" }));
 app.use(express.json()); // All other routes use JSON
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
@@ -55,7 +54,7 @@ async function activateUserByEmail(email) {
   }
 }
 
-app.post("/webhook", (req, res) => {
+app.post("/webhook", express.raw({type: 'application/json'}), (req, res) => {
  
   const sig = req.headers["stripe-signature"];
   let event;
