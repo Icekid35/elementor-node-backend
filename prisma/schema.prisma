@@ -29,13 +29,12 @@ model Company {
 model SelfEmployed {
   id                      Int      @id @default(autoincrement())
   first_name              String
-  last_name               String
+  surname                  String
   business_email          String   @unique
   phone_number            String
   occupation              String
   service_provided        String
   region                  String
-  years_experience        String
   password                String
   consent_age            Boolean
   consent_work_uk        Boolean
