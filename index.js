@@ -56,8 +56,7 @@ async function activateUserByEmail(email) {
 }
 
 app.post("/webhook", (req, res) => {
-   console.lof("webhook")
-   console.log(re.body)
+ 
   const sig = req.headers["stripe-signature"];
   let event;
 
