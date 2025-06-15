@@ -9,6 +9,13 @@ dotenv.config();
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
+app.use(express.json({
+verify: (req, res, buf) => {
+  if (req.originalUrl.startsWith('/stripe/webhook')) {
+    req.rawBody = buf.toString();
+  }
+},
+ })); // All other routes use JSON
 
 app.use(cors());
 // Stripe webhook route needs raw body
@@ -53,39 +60,14 @@ async function activateUserByEmail(email) {
   }
 }
 
-//  Symbol(kHeaders): {
-//     host: 'elementor-node-backend.onrender.com',
-//     'user-agent': 'Stripe/1.0 (+https://stripe.com/docs/webhooks)',
-//     'content-length': '3530',
-//     accept: '*/*; q=0.5, application/json',
-//     'accept-encoding': 'gzip, br',
-//     'cache-control': 'no-cache',
-//     'cdn-loop': 'cloudflare; loops=1',
-//     'cf-connecting-ip': '3.130.192.231',
-//     'cf-ipcountry': 'US',
-//     'cf-ray': '9502b2a82e0dcf7b-PDX',
-//     'cf-visitor': '{"scheme":"https"}',
-//     'content-type': 'application/json; charset=utf-8',
-//     'render-proxy-ttl': '4',
-//     'rndr-id': 'a3a9643b-e8ed-4726',
-//     'stripe-signature': 't=1749997118,v1=2b94bcac51c2a4cc995dfc63f1f343f1528832843d1d2f72836c8d9482f22c7a,v0=0ffd5521ba854d3c22fa25d12665e34da7ba83a6708f7eacdf286bc3f21be9f7',
-//     'true-client-ip': '3.130.192.231',
-//     'x-forwarded-for': '3.130.192.231, 104.23.160.39, 10.214.214.53',
-//     'x-forwarded-proto': 'https',
-//     'x-request-start': '1749997118813065'
-//   },
-//   Symbol(kHeadersCount): 38,
-//   Symbol(kTrailers): null,
-//   Symbol(kTrailersCount): 0
-// }
-app.post("/webhook", express.raw({type: 'application/json'}), (req, res) => {
- console.log(req.headers)
+app.post("/webhook", (req, res) => {
+ console.log(req.body)
   const sig = req.headers["stripe-signature"];
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(
-      req.body,
+      req.rawBody,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
@@ -114,7 +96,6 @@ app.post("/webhook", express.raw({type: 'application/json'}), (req, res) => {
 
   res.status(200).send("Webhook received");
 });
-app.use(express.json()); // All other routes use JSON
 
 // === Health Check ===
 app.get("/", (req, res) => {
