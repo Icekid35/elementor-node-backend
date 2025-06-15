@@ -58,7 +58,7 @@ app.post("/webhook", express.raw({type: 'application/json'}), (req, res) => {
 
   try {
     event = stripe.webhooks.constructEvent(
-      req.body,
+      req.body.toString(),
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
