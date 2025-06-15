@@ -10,17 +10,10 @@ const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
-app.use(express.json({
-        verify: function(req, res, buf) {
-            req.rawBody = buf;
-        }
-    })); // All other routes use JSON
 
 app.use(cors());
 // Stripe webhook route needs raw body
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: "2023-08-16",
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // === Helper: Check email in both models ===
 async function checkEmailExistsInAnyModel(email) {
@@ -59,13 +52,13 @@ async function activateUserByEmail(email) {
 }
 
 app.post("/webhook", express.raw({type: 'application/json'}), (req, res) => {
- console.log(req.rawBody)
+ console.log(req.body)
   const sig = req.headers["stripe-signature"];
   let event;
 
   try {
     event = stripe.webhooks.constructEvent(
-      req.rawBody,
+      req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET
     );
@@ -94,6 +87,7 @@ app.post("/webhook", express.raw({type: 'application/json'}), (req, res) => {
 
   res.status(200).send("Webhook received");
 });
+app.use(express.json()); // All other routes use JSON
 
 // === Health Check ===
 app.get("/", (req, res) => {
