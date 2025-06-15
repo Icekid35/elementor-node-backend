@@ -1,13 +1,23 @@
 import express from "express";
 import cors from "cors";
 import { PrismaClient } from "@prisma/client";
+import Stripe from "stripe";
+// Raw body parser for Stripe webhook
+import dotenv from "dotenv";
+dotenv.config();
 
 const app = express();
 const prisma = new PrismaClient();
 const PORT = process.env.PORT || 5000;
 
 app.use(cors());
-app.use(express.json());
+// Stripe webhook route needs raw body
+app.post("/webhook", express.raw({ type: "application/json" }));
+app.use(express.json()); // All other routes use JSON
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+  apiVersion: "2023-08-16",
+});
 
 // === Helper: Check email in both models ===
 async function checkEmailExistsInAnyModel(email) {
@@ -17,6 +27,69 @@ async function checkEmailExistsInAnyModel(email) {
   ]);
   return company || selfEmployed;
 }
+
+async function activateUserByEmail(email) {
+  try {
+    const [company, selfEmployed] = await Promise.all([
+      prisma.company.findUnique({ where: { business_email: email } }),
+      prisma.selfEmployed.findUnique({ where: { business_email: email } }),
+    ]);
+
+    if (company) {
+      await prisma.company.update({
+        where: { business_email: email },
+        data: { active: true },
+      });
+      console.log("✅ Company activated:", email);
+    } else if (selfEmployed) {
+      await prisma.selfEmployed.update({
+        where: { business_email: email },
+        data: { active: true },
+      });
+      console.log("✅ Self-employed activated:", email);
+    } else {
+      console.warn("❗No user found with email:", email);
+    }
+  } catch (error) {
+    console.error("❌ Failed to activate user:", error);
+  }
+}
+
+app.post("/webhook", (req, res) => {
+  const sig = req.headers["stripe-signature"];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET
+    );
+  } catch (err) {
+    console.error(`❌ Webhook signature verification failed:`, err.message);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+
+  // ✅ Handle Stripe events
+  switch (event.type) {
+    case "checkout.session.completed":
+      const session = event.data.object;
+
+      // You can attach metadata to the session to identify users
+      const email = session?.customer_details?.email;
+
+      console.log("✅ Payment successful for:", email);
+
+      // Example: Activate the user
+      activateUserByEmail(email);
+      break;
+
+    default:
+      console.log(`Unhandled event type: ${event.type}`);
+  }
+
+  res.status(200).send("Webhook received");
+});
 
 // === Health Check ===
 app.get("/", (req, res) => {

@@ -23,6 +23,7 @@ model Company {
   consent_age            Boolean
   consent_work_uk        Boolean
   publication_consent    Boolean
+  active                 Boolean  @default(false)
   createdAt              DateTime @default(now())
 }
 model SelfEmployed {
@@ -41,5 +42,6 @@ model SelfEmployed {
   publication_consent    Boolean
   latitude                Float
   longitude               Float
+  active                 Boolean  @default(false)
   createdAt               DateTime @default(now())
 }
