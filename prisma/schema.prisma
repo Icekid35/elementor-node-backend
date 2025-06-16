@@ -11,13 +11,12 @@ model Company {
   id                     Int      @id @default(autoincrement())
   company_name           String
   business_email         String   @unique
-  phone_number           String
+  phone_number           String?
   area_of_specialization String
   region                 String
-  company_website        String
-  company_description    String
+  company_website        String?
+  company_description    String?
   password               String
-  specialization_details String
   latitude               Float
   longitude              Float
   consent_age            Boolean
@@ -28,12 +27,11 @@ model Company {
 }
 model SelfEmployed {
   id                      Int      @id @default(autoincrement())
-  first_name              String
-  last_name               String
+  full_name              String
   business_email          String   @unique
-  phone_number            String
+  phone_number            String?
   occupation              String
-  service_provided        String
+  service_provided        String?
   region                  String
   password                String
   consent_age            Boolean
