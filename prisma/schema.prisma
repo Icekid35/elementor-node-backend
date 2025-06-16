@@ -32,6 +32,7 @@ model SelfEmployed {
   phone_number            String?
   occupation              String
   service_provided        String?
+  website                 String?
   region                  String
   password                String
   consent_age            Boolean
